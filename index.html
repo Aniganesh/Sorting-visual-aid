@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting algorithms visualised</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <div class="flex-container full-screen">
+        <div class="flex-container main-container">
+            <div class="flex-container" id="dataset">
+            </div>
+            <div class="flex-container controls-container">
+                <fieldset>
+                    <legend>Select type of sorting</legend>
+                    <input type="radio" name="sorttype" id="brute" value='brute' checked />
+                    <label for="brute">Brute force/simple</label><br />
+                    <!-- <input type="radio" name="sorttype" id="selection" value="selection" />
+                    <label for="selection">Selection</label><br /> -->
+                    <input type="radio" name="sorttype" id="quick" value="quick" />
+                    <label for="quick">Quick sort</label><br />
+                    <input type="radio" name="sorttype" id="bubble" value="bubble" />
+                    <label for="bubble">Bubble sort</label><br />
+
+                </fieldset>
+                <br /><br />
+                <div class="progress-div">
+                    <div class="progress-bar"></div>
+                </div>
+
+                <input type="range" min="5" max="20" id="count" />
+                <button id="generatenums">Generate</button>
+                <button id="sort">Sort</button>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</body>
+
+</html>
