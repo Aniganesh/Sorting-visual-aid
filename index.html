@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorting algorithms visualised</title>
+    <link rel="stylesheet" href="Reset.css" />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
 </head>
@@ -32,8 +33,12 @@
                     <div class="progress-bar"></div>
                 </div>
 
-                <input type="range" min="5" max="20" id="count" />
-                <button id="generatenums">Generate</button>
+                <form class="flex-space-between flex-container" name="myform" oninput="range1value.value = 'Generate ' + range1.value +' numbers to sort'">
+                    <input name="range1" class="flex-1" type="range" step="1" min="5" max="20" value="10" id="count">
+                    <button class="flex-1" type="button" id="generatenums"><output name="range1value"
+                            for="range1">Generate 10 numbers to sort</output></button>
+
+                </form>
                 <button id="sort">Sort</button>
             </div>
 
