@@ -4,7 +4,7 @@
 
 {#if number !== undefined}
   <div
-    style={`height: ${number * 2}px`}
+    style={`height: ${number * 3}px`}
     class="main-div"
     id={number.toString()}
   >
