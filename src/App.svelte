@@ -1,5 +1,5 @@
 <script lang="ts">
-  import LinesContainer from "./components/LinesContainer.svelte";
+  import SortingContainer from "./components/SortingContainer.svelte";
   import { createForm } from "svelte-forms-lib";
   let numbers = [];
   const { form, handleChange, handleSubmit } = createForm({
@@ -15,7 +15,7 @@
 </script>
 
 <main>
-  <LinesContainer {numbers} />
+  <SortingContainer {numbers} />
   <div class="form-container">
     <form on:submit={handleSubmit}>
       <label for="numberOfValues">Number of Values to sort</label>
