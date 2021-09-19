@@ -10,7 +10,7 @@ interface Store {
 }
 
 const createStore = () => {
-  const { subscribe, set, update } = writable({
+  const { subscribe, set, update } = writable<Store>({
     numbers: [],
     comparingIndices: [],
     minIndex: undefined,
@@ -26,7 +26,6 @@ const createStore = () => {
     });
   };
   const sortWithWait = async (wait: number, type: SortTypes) => {
-    console.log(`Sorting with wait of ${wait} seconds`);
     switch (type) {
       case SortTypes.SELECTION:
         selectionSortWithWait(wait);
@@ -44,7 +43,6 @@ const createStore = () => {
   };
   const selectionSortWithWait = async (wait: number) => {
     let numbers: number[], minIndex: number;
-    console.log("Selection sort running");
     subscribe((value) => {
       numbers = value.numbers;
       minIndex = value.minIndex;

@@ -21,7 +21,6 @@
   });
 
   const sort = async () => {
-    console.log("sorting");
     await sortWithWait(1, SortTypes.SELECTION);
   };
   let numbersContainer;
@@ -56,9 +55,7 @@
     </div>
     <Button
       on:click={() => {
-        console.log({ numbers });
         if (numbers.length) {
-          console.log("Calling sort");
           sort();
         }
       }}>sort</Button
