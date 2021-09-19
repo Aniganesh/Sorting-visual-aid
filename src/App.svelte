@@ -1,21 +1,27 @@
 <script lang="ts">
   import SortingContainer from "./components/SortingContainer.svelte";
   import { createForm } from "svelte-forms-lib";
-  let numbers = [];
+  import mainStore from "./Stores";
+
   const { form, handleChange, handleSubmit } = createForm({
     initialValues: {
       numberOfValues: 10,
     },
     onSubmit: ({ numberOfValues }) => {
-      numbers = Array.from({ length: numberOfValues }).map(() =>
-        Math.floor(Math.random() * 100)
-      );
+      mainStore.update((values) => {
+        return {
+          ...values,
+          numbers: Array.from({ length: numberOfValues }).map(() =>
+            Math.floor(Math.random() * 100)
+          ),
+        };
+      });
     },
   });
 </script>
 
 <main>
-  <SortingContainer {numbers} />
+  <SortingContainer />
   <div class="form-container">
     <form on:submit={handleSubmit}>
       <label for="numberOfValues">Number of Values to sort</label>
