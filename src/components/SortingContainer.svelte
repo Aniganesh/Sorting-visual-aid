@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { waitSeconds } from "../resources/utils";
+  import Button from "smelte/src/components/Button";
   import NumberLine from "./NumberLine/index.svelte";
   import {
     numberLinePxPerUnit,
@@ -11,17 +11,17 @@
 
   let minIndex,
     comparingIndices,
-    sortWithWait: (this: any, wait: number, type: SortTypes) => Promise<void>,
+    sortWithWait = mainStore.sortWithWait,
     numbers: number[];
 
   mainStore.subscribe((value) => {
     minIndex = value.minIndex;
-    sortWithWait = value.sortWithWait;
     comparingIndices = value.comparingIndices;
     numbers = value.numbers;
   });
 
   const sort = async () => {
+    console.log("sorting");
     await sortWithWait(1, SortTypes.SELECTION);
   };
   let numbersContainer;
@@ -54,12 +54,14 @@
     <div>
       {minIndex !== undefined ? numbers[minIndex] : ""}
     </div>
-    <button
+    <Button
       on:click={() => {
+        console.log({ numbers });
         if (numbers.length) {
+          console.log("Calling sort");
           sort();
         }
-      }}>sort</button
+      }}>sort</Button
     >
   </div>
 </div>

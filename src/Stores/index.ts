@@ -3,15 +3,33 @@ import { SortTypes } from "../@types";
 import { waitSeconds } from "../resources/utils";
 import { arrayMoveImmutable as arrayMove } from "array-move";
 
-const mainStore = {
-  numbers: [],
-  comparingIndices: [],
-  minIndex: undefined,
+interface Store {
+  numbers: number[];
+  comparingIndices: number[];
+  minIndex?: number;
+}
 
-  sortWithWait: async function (this, wait: number, type: SortTypes) {
+const createStore = () => {
+  const { subscribe, set, update } = writable({
+    numbers: [],
+    comparingIndices: [],
+    minIndex: undefined,
+  });
+  const setNumbers = (numbers: number[]) => {
+    update((values) => {
+      return { ...values, numbers };
+    });
+  };
+  const customUpdate = (newValues: Partial<Store>) => {
+    update((values) => {
+      return { ...values, ...newValues };
+    });
+  };
+  const sortWithWait = async (wait: number, type: SortTypes) => {
+    console.log(`Sorting with wait of ${wait} seconds`);
     switch (type) {
       case SortTypes.SELECTION:
-        this?.selectionSortWithWait(this.numbers, wait);
+        selectionSortWithWait(wait);
         break;
       case SortTypes.MERGE:
         throw new Error("Not implemented");
@@ -23,29 +41,37 @@ const mainStore = {
         throw new Error("Not implemented");
         break;
     }
-  },
-  selectionSortWithWait: async function (this, wait: number) {
-    for (let i = 0; i < this.numbers.length; ++i) {
-      this.minIndex = i;
-      for (let j = i + 1; j < this.unsorted.length; ++j) {
-        this.comparingIndices = [this.minIndex, j];
+  };
+  const selectionSortWithWait = async (wait: number) => {
+    let numbers: number[], minIndex: number;
+    console.log("Selection sort running");
+    subscribe((value) => {
+      numbers = value.numbers;
+      minIndex = value.minIndex;
+    });
+    for (let i = 0; i < numbers.length; ++i) {
+      customUpdate({ minIndex: i });
+      for (let j = i + 1; j < numbers.length; ++j) {
+        customUpdate({ comparingIndices: [minIndex, j] });
         if (i === j) {
           continue;
         }
         await waitSeconds(wait);
-        if (this.numbers[j] < this.numbers[this.minIndex]) {
-          this.minIndex = j;
+        if (numbers[j] < numbers[minIndex]) {
+          customUpdate({ minIndex: j });
         }
       }
-      const partiallySorted = arrayMove(this.numbers, this.minIndex, i);
-      this.numbers = partiallySorted;
-      this.minIndex = i;
+      const partiallySorted = arrayMove(numbers, minIndex, i);
+      customUpdate({ numbers: partiallySorted, minIndex: i });
       await waitSeconds(wait);
     }
-    this.comparingIndices = [];
-    this.minIndex = undefined;
-  },
+    customUpdate({ comparingIndices: [], minIndex: undefined });
+  };
+  return {
+    subscribe,
+    setNumbers,
+    sortWithWait,
+  };
 };
-
-export const main = writable(mainStore);
-export default main;
+export const mainStore = createStore();
+export default mainStore;
