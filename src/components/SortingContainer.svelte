@@ -8,21 +8,36 @@
   } from "./NumberLine/Constants";
   import { SortTypes } from "../@types";
   import mainStore from "../Stores";
+  import { createForm } from "svelte-forms-lib";
 
   let minIndex,
     comparingIndices,
     sortWithWait = mainStore.sortWithWait,
     numbers: number[];
-
+  const sortTypes = [
+    // SortTypes.BUBBLE,
+    // SortTypes.MERGE,
+    // SortTypes.QUICK,
+    SortTypes.SELECTION,
+  ];
   mainStore.subscribe((value) => {
-    minIndex = value.minIndex;
+    minIndex = value.stateInfo.minIndex;
     comparingIndices = value.comparingIndices;
     numbers = value.numbers;
   });
 
-  const sort = async () => {
-    await sortWithWait(1, SortTypes.SELECTION);
-  };
+  const {
+    handleChange: sortTypeChange,
+    form,
+    handleSubmit: sortTypeSubmit,
+  } = createForm({
+    initialValues: {
+      sortType: SortTypes.SELECTION,
+    },
+    onSubmit: ({ sortType }: { sortType: SortTypes }) => {
+      if (numbers.length) mainStore.sortWithWait(1, sortType);
+    },
+  });
   let numbersContainer;
   let numberLineAreaBegin;
   $: numberLineAreaBegin =
@@ -34,7 +49,8 @@
 
 <div class="top-container">
   <div class="numbers-container" bind:this={numbersContainer}>
-    {#if minIndex !== undefined}<div
+    {#if minIndex !== undefined}
+      <div
         style={`bottom: ${numberLinePxPerUnit * numbers[minIndex]}px; 
         left: ${
           numberLineAreaBegin +
@@ -51,32 +67,43 @@
   </div>
   <div>
     <div>
-      {minIndex !== undefined ? numbers[minIndex] : ""}
+      {minIndex !== undefined ? `Minimum: ${numbers[minIndex]}` : ""}
     </div>
-    <Button
-      on:click={() => {
-        if (numbers.length) {
-          sort();
-        }
-      }}>sort</Button
-    >
+    <form on:submit={sortTypeSubmit}>
+      <fieldset>
+        <legend>Select sort type</legend>
+        {#each sortTypes as sortType}
+          <label>
+            <input
+              type="radio"
+              name="sortType"
+              on:change={sortTypeChange}
+              bind:value={sortType}
+              checked={$form.sortType === sortType}
+            />
+            {sortType.toUpperCase()}
+          </label>
+        {/each}
+      </fieldset>
+
+      <Button type="submit" on:click={sortTypeSubmit}>sort</Button>
+    </form>
   </div>
 </div>
 
 <style>
   .numbers-container {
-    /* width: 100%; */
     height: 500px;
     position: relative;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    width: 600px;
+    width: 800px;
   }
   .top-container {
     display: flex;
     align-items: center;
-    width: 700;
+    width: 1000px;
   }
   .minIndicator {
     position: absolute;

@@ -47,7 +47,7 @@
   main {
     text-align: center;
     padding: 1em;
-    max-width: 700px;
+    max-width: 1000px;
     margin: 0 auto;
   }
   form {
