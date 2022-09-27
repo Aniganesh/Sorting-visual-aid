@@ -15,6 +15,9 @@
     numbers: number[],
     comparingIndices: [number, number],
     speed: number;
+  let position = 0;
+  let paused = false;
+  let isSorting = false;
   const sortTypes = [
     // SortTypes.BUBBLE,
     // SortTypes.MERGE,
@@ -26,7 +29,6 @@
     numbers = value.numbers;
     speed = value.speed;
   });
-
   const {
     handleChange: sortTypeChange,
     form,
@@ -39,34 +41,42 @@
       if (numbers.length) {
         mainStore.sort(sortType);
         if (animations.length) {
+          paused = false;
+          isSorting = true;
           animate();
         }
       }
     },
   });
 
-  const animate = (position: number = 0) => {
-    if (position >= animations.length) {
+  const animate = (_position: number = 0) => {
+    if (_position >= animations.length) {
+      isSorting = false;
       return;
     }
 
+    position = _position;
     const {
       comparingIndices: _comparingIndices,
       minIndex: _minIndex,
       swap: _swap,
-    } = animations[position];
+    } = animations[_position];
+
     if (_minIndex !== undefined && _minIndex !== null) {
       minIndex = _minIndex;
     }
+
     if (_comparingIndices) comparingIndices = _comparingIndices;
+
     if (_swap && _swap.length === 2) {
       let temp = numbers[_swap[0]];
       numbers[_swap[0]] = numbers[_swap[1]];
       numbers[_swap[1]] = temp;
     }
-    setTimeout(() => {
-      animate(position + 1);
-    }, speed);
+    if (!paused)
+      setTimeout(() => {
+        animate(_position + 1);
+      }, speed);
   };
   const onSpeedChange = (event) => {
     mainStore.setSpeed(5000 - (event.currentTarget as { value: number }).value);
@@ -79,6 +89,16 @@
       numbers.length * (numberLineWidth + numberLineSpacing) -
       numberLineSpacing) /
     2;
+  let buttonText;
+  $: buttonText = paused ? "Resume" : "Pause";
+  const togglePause = () => {
+    if (paused) {
+      paused = false;
+      animate(position + 1);
+    } else {
+      paused = true;
+    }
+  };
 </script>
 
 <div class="top-container">
@@ -125,14 +145,23 @@
 
       <Button type="submit" on:click={sortTypeSubmit}>sort</Button>
     </form>
-    <input
-      type="range"
-      min="100"
-      max="5200"
-      step="100"
-      bind:value={speedInputValue}
-      on:change={onSpeedChange}
-    />
+    <br />
+    <label>
+      Speed
+      <input
+        type="range"
+        min="100"
+        max="5200"
+        step="100"
+        bind:value={speedInputValue}
+        on:change={onSpeedChange}
+      />
+    </label>
+    {#if isSorting !== false}
+      <Button on:click={togglePause}>
+        {buttonText}
+      </Button>
+    {/if}
   </div>
 </div>
 
