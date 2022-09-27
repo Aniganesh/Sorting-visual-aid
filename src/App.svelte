@@ -3,19 +3,24 @@
   import { createForm } from "svelte-forms-lib";
   import mainStore from "./Stores";
   import "smelte/src/tailwind.css";
-  import Button from "smelte/src/components/Button";
-  const { form, handleChange, handleSubmit } = createForm({
+  // import Button from "smelte/src/components/Button";
+  
+  const generateArray = (numberOfValues: number) => {
+    mainStore.setNumbers(
+      Array.from({ length: numberOfValues }).map(() =>
+        Math.floor(Math.random() * 100)
+      )
+    );
+  };
+  const { form, handleChange, handleSubmit, state } = createForm({
     initialValues: {
       numberOfValues: 10,
     },
-    onSubmit: ({ numberOfValues }) => {
-      mainStore.setNumbers(
-        Array.from({ length: numberOfValues }).map(() =>
-          Math.floor(Math.random() * 100)
-        )
-      );
-    },
+    onSubmit: () => {},
   });
+  state.subscribe(({ form: { numberOfValues } }) =>
+    generateArray(numberOfValues)
+  );
 </script>
 
 <link
@@ -36,9 +41,6 @@
         on:change={handleChange}
         bind:value={$form.numberOfValues}
       />
-      <Button type="submit" color="primary">
-        Generate <strong>{$form.numberOfValues}</strong> values
-      </Button>
     </form>
   </div>
 </main>
