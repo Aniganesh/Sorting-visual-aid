@@ -7,13 +7,14 @@
     numberLineWidth,
   } from "./NumberLine/Constants";
   import { SortTypes } from "../@types";
-  import mainStore from "../Stores";
+  import mainStore, { SortAnimation } from "../Stores";
   import { createForm } from "svelte-forms-lib";
 
   let minIndex,
-    comparingIndices,
-    sortWithWait = mainStore.sortWithWait,
-    numbers: number[];
+    animations: SortAnimation[],
+    numbers: number[],
+    comparingIndices: [number, number],
+    speed: number;
   const sortTypes = [
     // SortTypes.BUBBLE,
     // SortTypes.MERGE,
@@ -21,9 +22,9 @@
     SortTypes.SELECTION,
   ];
   mainStore.subscribe((value) => {
-    minIndex = value.stateInfo.minIndex;
-    comparingIndices = value.comparingIndices;
+    animations = value.sortAnimations;
     numbers = value.numbers;
+    speed = value.speed;
   });
 
   const {
@@ -35,9 +36,42 @@
       sortType: SortTypes.SELECTION,
     },
     onSubmit: ({ sortType }: { sortType: SortTypes }) => {
-      if (numbers.length) mainStore.sortWithWait(1, sortType);
+      if (numbers.length) {
+        mainStore.sort(sortType);
+        if (animations.length) {
+          animate();
+        }
+      }
     },
   });
+
+  const animate = (position: number = 0) => {
+    if (position >= animations.length) {
+      return;
+    }
+
+    const {
+      comparingIndices: _comparingIndices,
+      minIndex: _minIndex,
+      swap: _swap,
+    } = animations[position];
+    if (_minIndex !== undefined && _minIndex !== null) {
+      minIndex = _minIndex;
+    }
+    if (_comparingIndices) comparingIndices = _comparingIndices;
+    if (_swap && _swap.length === 2) {
+      let temp = numbers[_swap[0]];
+      numbers[_swap[0]] = numbers[_swap[1]];
+      numbers[_swap[1]] = temp;
+    }
+    setTimeout(() => {
+      animate(position + 1);
+    }, speed);
+  };
+  const onSpeedChange = (event) => {
+    mainStore.setSpeed(5000 - (event.currentTarget as { value: number }).value);
+  };
+  let speedInputValue = 5000 - speed;
   let numbersContainer;
   let numberLineAreaBegin;
   $: numberLineAreaBegin =
@@ -62,7 +96,10 @@
         <span>min</span><span>^</span>
       </div>{/if}
     {#each numbers as number, index}
-      <NumberLine isBeingCompared={comparingIndices.includes(index)} {number} />
+      <NumberLine
+        isBeingCompared={comparingIndices?.includes(index)}
+        {number}
+      />
     {/each}
   </div>
   <div>
@@ -88,6 +125,14 @@
 
       <Button type="submit" on:click={sortTypeSubmit}>sort</Button>
     </form>
+    <input
+      type="range"
+      min="100"
+      max="5200"
+      step="100"
+      bind:value={speedInputValue}
+      on:change={onSpeedChange}
+    />
   </div>
 </div>
 
